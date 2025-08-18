@@ -25,7 +25,7 @@ RUN apk update && apk add --no-cache \
 RUN echo "node ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # 추가 Python 패키지 (선택사항)
-RUN pip3 install requests pandas
+//RUN pip3 install requests pandas
 
 # node 사용자가 /app 디렉토리에 쓰기 권한 갖도록 설정
 RUN mkdir -p /app && chown -R node:node /app
