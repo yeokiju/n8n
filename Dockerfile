@@ -14,7 +14,7 @@ RUN echo "node ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # node 사용자를 docker 그룹에 추가
 RUN addgroup -g 999 docker || true
-RUN adduser node docker
+#RUN adduser node docker
 
 # 권한 설정
 RUN mkdir -p /app && chown -R node:node /app
