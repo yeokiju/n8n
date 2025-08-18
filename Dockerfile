@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM n8nio/n8n:latest
 # 필요한 도구들 설치
 RUN apk update && apk add --no-cache \
     curl \
