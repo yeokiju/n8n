@@ -2,8 +2,13 @@ FROM n8nio/n8n:latest
 
 USER root
 
-# 기본 패키지만 설치
-RUN apk add --no-cache bash
+# 기본 패키지 및 sudo 설치
+RUN apk add --no-cache bash sudo shadow
+
+# node 계정에 sudo 권한 부여
+RUN echo "node ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/node && \
+    chmod 0440 /etc/sudoers.d/node && \
+    addgroup node wheel 2>/dev/null || true
 
 # 디렉토리 권한 설정
 RUN mkdir -p /home/node/.n8n /data && \
