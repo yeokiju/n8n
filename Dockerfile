@@ -2,21 +2,26 @@ FROM n8nio/n8n:latest
 
 USER root
 
-# Docker CLI와 필요한 도구들 설치
+# 필요한 패키지 설치
 RUN apk update && apk add --no-cache \
     curl wget git bash nano vim \
     python3 py3-pip nodejs npm \
     htop jq openssh-client ca-certificates \
-    sudo docker-cli
+    sudo shadow util-linux busybox-suid
+
+# SUID 권한 설정
+RUN chmod u+s /bin/su
+RUN chmod u+s /usr/bin/sudo
+RUN chmod u+s /bin/busybox
 
 # sudo 설정
 RUN echo "node ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+RUN echo "Defaults !requiretty" >> /etc/sudoers
 
-# node 사용자를 docker 그룹에 추가
-RUN addgroup -g 999 docker || true
-#RUN adduser node docker
+# 그룹 설정
+RUN adduser node wheel
 
-# 권한 설정
+# 디렉토리 권한
 RUN mkdir -p /app && chown -R node:node /app
 
 USER node
