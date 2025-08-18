@@ -30,4 +30,3 @@ COPY . .
 EXPOSE 5678
 
 # n8n 시작 (기본 명령어 유지)
-CMD ["n8n", "start"]
