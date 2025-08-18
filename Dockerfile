@@ -8,4 +8,3 @@ COPY . .
 # 포트 노출
 EXPOSE 3000
 # HTTP 서버 시작 (헬스체크용)
-CMD ["python3", "-m", "http.server", "3000"]
