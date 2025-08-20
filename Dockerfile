@@ -39,13 +39,13 @@ RUN echo '#!/bin/bash' > /start-n8n.sh && \
     echo 'echo "  - N8N_HOST: $N8N_HOST"' >> /start-n8n.sh && \
     echo 'echo "  - N8N_PORT: $N8N_PORT"' >> /start-n8n.sh && \
     echo 'echo "  - EXECUTIONS_PROCESS: $EXECUTIONS_PROCESS (Docker disabled)"' >> /start-n8n.sh && \
-    echo 'echo "========================================="' >> /start-n8n.sh && \ 
+    echo 'echo "========================================="' >> /start-n8n.sh && \
     echo '' >> /start-n8n.sh && \
     echo '# n8n 실행' >> /start-n8n.sh && \
     echo 'exec n8n' >> /start-n8n.sh && \
     chmod +x /start-n8n.sh
 
-# Docker 명령어를 더미로 대체 (에러 방지용)
+# docker 명령어 더미 파일 추가 (/usr/local/bin 기준으로 모든 경로 커버)
 RUN echo '#!/bin/sh' > /usr/local/bin/docker && \
     echo 'echo "Docker is not available. Using main process execution."' >> /usr/local/bin/docker && \
     echo 'exit 0' >> /usr/local/bin/docker && \
@@ -63,7 +63,6 @@ ENV EXECUTIONS_PROCESS=main \
     GENERIC_TIMEZONE=Asia/Seoul
 
 USER node
-
 WORKDIR /home/node
 
 EXPOSE 5678
