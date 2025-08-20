@@ -53,4 +53,3 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 USER node
 WORKDIR /home/node
 
-CMD ["n8n"]
