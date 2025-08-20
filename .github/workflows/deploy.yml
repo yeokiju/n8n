@@ -30,8 +30,8 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/your-name/your-repo:latest
-            ghcr.io/your-name/your-repo:${{ github.sha }}
+            ghcr.io/yeokiju/n8n:latest
+            ghcr.io/yeokiju/n8n:${{ github.sha }}
 
       - name: Deploy to Sliplane
         run: |
