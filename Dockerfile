@@ -39,7 +39,7 @@ RUN echo '#!/bin/bash' > /start-n8n.sh && \
     echo 'echo "  - N8N_HOST: $N8N_HOST"' >> /start-n8n.sh && \
     echo 'echo "  - N8N_PORT: $N8N_PORT"' >> /start-n8n.sh && \
     echo 'echo "  - EXECUTIONS_PROCESS: $EXECUTIONS_PROCESS (Docker disabled)"' >> /start-n8n.sh && \
-    echo 'echo "========================================="' >> /start-n8n.sh && \
+    echo 'echo "========================================="' >> /start-n8n.sh && \ 
     echo '' >> /start-n8n.sh && \
     echo '# n8n 실행' >> /start-n8n.sh && \
     echo 'exec n8n' >> /start-n8n.sh && \
