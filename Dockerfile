@@ -1,42 +1,56 @@
+# n8n with mammoth.js support
 FROM n8nio/n8n:latest
 
+# Switch to root user to install packages
 USER root
 
-# 패키지 설치
+# Update package list and install dependencies
 RUN apk update && apk add --no-cache \
-    curl \
-    wget \
-    git \
-    bash \
     python3 \
     py3-pip \
-    jq \
-    vim \
-    && rm -rf /var/cache/apk/*
+    make \
+    g++ \
+    git
 
-# Python 패키지 설치
-RUN pip3 install --no-cache-dir --break-system-packages \
-    requests \
-    pandas \
-    beautifulsoup4
+# Create directory for custom node modules
+RUN mkdir -p /usr/local/lib/node_modules
 
-# 테스트 스크립트만 생성 (실행은 수동으로)
-RUN mkdir -p /scripts
-RUN cat > /scripts/curl-test.sh << 'EOF'
-#!/bin/bash
-echo "=== Network Test ==="
-curl -s -o /dev/null -w "Naver: %{http_code}\n" https://www.naver.com
-curl -s -o /dev/null -w "Google: %{http_code}\n" https://www.google.com
-echo "=== Test Complete ==="
-EOF
-RUN chmod +x /scripts/curl-test.sh
+# Install mammoth globally
+RUN npm install -g mammoth
 
-# 타임존 설정
-ENV TZ=Asia/Seoul
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+# Install additional useful packages for document processing
+RUN npm install -g \
+    mammoth \
+    docx-parser \
+    pdf-parse \
+    xlsx \
+    csv-parser \
+    cheerio
 
+# Create a custom node_modules directory that n8n can access
+RUN mkdir -p /home/node/.n8n/custom_modules
+WORKDIR /home/node/.n8n/custom_modules
+
+# Install packages locally for n8n Code nodes
+RUN npm init -y && npm install \
+    mammoth \
+    docx-parser \
+    pdf-parse \
+    xlsx \
+    csv-parser \
+    cheerio \
+    jsdom
+
+# Set proper permissions
+RUN chown -R node:node /home/node/.n8n
+RUN chmod -R 755 /home/node/.n8n
+
+# Switch back to node user
 USER node
-WORKDIR /home/node
 
-# 기본 n8n 실행 명령어 사용 (가장 안전)
-CMD ["n8n", "start"]
+# Set environment variables
+ENV NODE_PATH=/home/node/.n8n/custom_modules/node_modules:/usr/local/lib/node_modules
+ENV N8N_CUSTOM_EXTENSIONS=/home/node/.n8n/custom_modules
+
+# Expose the n8n port
+EXPOSE 5678
