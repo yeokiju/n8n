@@ -22,15 +22,7 @@ RUN npm install -g \
 # Switch back to node user
 USER node
 
-# Set environment variables for Sliplane compatibility
-ENV NODE_PATH=/usr/local/lib/node_modules
-ENV N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=false
-ENV N8N_PROXY_HOPS=1
-ENV N8N_HOST=0.0.0.0
-ENV TRUST_PROXY=true
-
 # Quick verification
 RUN curl --version && node --version
 
 EXPOSE 5678
-CMD ["n8n", "start"]
