@@ -35,4 +35,4 @@ jobs:
 
       - name: Deploy to Sliplane
         run: |
-          curl "https://api.sliplane.io/deploy/service_c9gwfpq7ilgm/${{ secrets.DEPLOY_SECRET }}?tag=${{ github.sha }}"
+          curl "https://api.sliplane.io/deploy/leo-n8n/${{ secrets.DEPLOY_SECRET }}?tag=${{ github.sha }}"
