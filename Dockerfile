@@ -2,49 +2,34 @@ FROM n8nio/n8n:latest
 
 USER root
 
-# Alpine Linux 패키지 설치
+# 패키지 설치
 RUN apk update && apk add --no-cache \
     curl \
     wget \
     git \
-    openssh-client \
-    ca-certificates \
-    gcc \
-    g++ \
-    make \
-    build-base \
-    linux-headers \
+    bash \
     python3 \
     py3-pip \
-    python3-dev \
-    bash \
-    vim \
     jq \
-    postgresql-client \
-    mysql-client \
+    vim \
     && rm -rf /var/cache/apk/*
 
-# Python 패키지 설치 (--break-system-packages 플래그 사용)
+# Python 패키지 설치
 RUN pip3 install --no-cache-dir --break-system-packages \
     requests \
     pandas \
-    numpy \
-    openpyxl \
-    beautifulsoup4 \
-    selenium \
-    python-dotenv \
-    pyyaml \
-    httpx
+    beautifulsoup4
 
-# npm 글로벌 패키지 설치
-RUN npm install -g \
-    axios \
-    puppeteer \
-    cheerio \
-    node-fetch \
-    dotenv \
-    csv-parser \
-    xlsx
+# 테스트 스크립트만 생성 (실행은 수동으로)
+RUN mkdir -p /scripts
+RUN cat > /scripts/curl-test.sh << 'EOF'
+#!/bin/bash
+echo "=== Network Test ==="
+curl -s -o /dev/null -w "Naver: %{http_code}\n" https://www.naver.com
+curl -s -o /dev/null -w "Google: %{http_code}\n" https://www.google.com
+echo "=== Test Complete ==="
+EOF
+RUN chmod +x /scripts/curl-test.sh
 
 # 타임존 설정
 ENV TZ=Asia/Seoul
@@ -53,3 +38,5 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 USER node
 WORKDIR /home/node
 
+# 기본 n8n 실행 명령어 사용 (가장 안전)
+CMD ["n8n", "start"]
