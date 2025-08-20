@@ -46,10 +46,12 @@ RUN echo '#!/bin/bash' > /start-n8n.sh && \
     chmod +x /start-n8n.sh
 
 # Docker 명령어를 더미로 대체 (에러 방지용)
-RUN echo '#!/bin/sh' > /usr/bin/docker && \
-    echo 'echo "Docker is not available in this environment. Using main process execution."' >> /usr/bin/docker && \
-    echo 'exit 0' >> /usr/bin/docker && \
-    chmod +x /usr/bin/docker
+RUN echo '#!/bin/sh' > /usr/local/bin/docker && \
+    echo 'echo "Docker is not available. Using main process execution."' >> /usr/local/bin/docker && \
+    echo 'exit 0' >> /usr/local/bin/docker && \
+    chmod +x /usr/local/bin/docker && \
+    ln -s /usr/local/bin/docker /usr/bin/docker && \
+    ln -s /usr/local/bin/docker /bin/docker
 
 # 기본 환경 변수 설정
 ENV EXECUTIONS_PROCESS=main \
