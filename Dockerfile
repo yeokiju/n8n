@@ -1,19 +1,16 @@
 FROM n8nio/n8n:latest
 
-USER root
-
-echo '#!/bin/sh' > /usr/local/bin/docker
-echo 'echo "Docker is not available. Using main process execution."' >> /usr/local/bin/docker
-echo 'exit 0' >> /usr/local/bin/docker
-chmod +x /usr/local/bin/docker
-
-which docker
-docker
-
-USER node
-WORKDIR /home/node
+ENV N8N_BASIC_AUTH_ACTIVE=true
+ENV N8N_BASIC_AUTH_USER=admin
+ENV N8N_BASIC_AUTH_PASSWORD=yourpassword
+ENV N8N_HOST=your-domain.com
+ENV N8N_PORT=5678
+ENV N8N_PROTOCOL=https
+ENV WEBHOOK_URL=https://your-domain.com/
+ENV GENERIC_TIMEZONE=Asia/Seoul
 
 EXPOSE 5678
 
-# 시작 스크립트 실행
-CMD ["/start-n8n.sh"]
+VOLUME ["/home/node/.n8n"]
+
+CMD ["n8n"]
