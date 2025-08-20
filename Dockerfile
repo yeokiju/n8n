@@ -2,8 +2,13 @@ FROM n8nio/n8n:latest
 
 USER root
 
-# 시작 스크립트 생성 (웹훅 URL 동적 설정)
+# 시작 스크립트 생성 (Docker 모드 비활성화 및 웹훅 URL 동적 설정)
 RUN echo '#!/bin/bash' > /start-n8n.sh && \
+    echo '' >> /start-n8n.sh && \
+    echo '# Docker 실행 모드 강제 비활성화' >> /start-n8n.sh && \
+    echo 'export EXECUTIONS_PROCESS=main' >> /start-n8n.sh && \
+    echo 'export EXECUTIONS_MODE=regular' >> /start-n8n.sh && \
+    echo 'export N8N_DOCKER_EXECUTIONS=false' >> /start-n8n.sh && \
     echo '' >> /start-n8n.sh && \
     echo '# 웹훅 URL이 설정되지 않았다면 기본값 사용' >> /start-n8n.sh && \
     echo 'if [ -z "$WEBHOOK_URL" ]; then' >> /start-n8n.sh && \
@@ -25,19 +30,31 @@ RUN echo '#!/bin/bash' > /start-n8n.sh && \
     echo '    export N8N_PROTOCOL="http"' >> /start-n8n.sh && \
     echo 'fi' >> /start-n8n.sh && \
     echo '' >> /start-n8n.sh && \
-    echo 'echo "Configuration:"' >> /start-n8n.sh && \
+    echo 'echo "========================================="' >> /start-n8n.sh && \
+    echo 'echo "n8n Configuration:"' >> /start-n8n.sh && \
+    echo 'echo "========================================="' >> /start-n8n.sh && \
     echo 'echo "  - WEBHOOK_URL: $WEBHOOK_URL"' >> /start-n8n.sh && \
     echo 'echo "  - N8N_PROTOCOL: $N8N_PROTOCOL"' >> /start-n8n.sh && \
     echo 'echo "  - N8N_EDITOR_BASE_URL: $N8N_EDITOR_BASE_URL"' >> /start-n8n.sh && \
     echo 'echo "  - N8N_HOST: $N8N_HOST"' >> /start-n8n.sh && \
     echo 'echo "  - N8N_PORT: $N8N_PORT"' >> /start-n8n.sh && \
+    echo 'echo "  - EXECUTIONS_PROCESS: $EXECUTIONS_PROCESS (Docker disabled)"' >> /start-n8n.sh && \
+    echo 'echo "========================================="' >> /start-n8n.sh && \
     echo '' >> /start-n8n.sh && \
     echo '# n8n 실행' >> /start-n8n.sh && \
     echo 'exec n8n' >> /start-n8n.sh && \
     chmod +x /start-n8n.sh
 
+# Docker 명령어를 더미로 대체 (에러 방지용)
+RUN echo '#!/bin/sh' > /usr/bin/docker && \
+    echo 'echo "Docker is not available in this environment. Using main process execution."' >> /usr/bin/docker && \
+    echo 'exit 0' >> /usr/bin/docker && \
+    chmod +x /usr/bin/docker
+
 # 기본 환경 변수 설정
 ENV EXECUTIONS_PROCESS=main \
+    EXECUTIONS_MODE=regular \
+    N8N_DOCKER_EXECUTIONS=false \
     N8N_HOST=0.0.0.0 \
     N8N_PORT=5678 \
     NODE_ENV=production \
