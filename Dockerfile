@@ -160,6 +160,3 @@ RUN echo "=== Installed Packages ===" && \
     npm list -g --depth=0 || true
 
 EXPOSE 5678
-
-# Use the wrapper script
-CMD ["/start.sh"]
