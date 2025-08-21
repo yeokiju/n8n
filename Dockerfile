@@ -32,6 +32,8 @@ RUN mkdir -p /home/node/.n8n && \
 # Switch back to node user
 USER node
 
+# Set working directory
+WORKDIR /home/node
 
 # Create volume mount point for persistent data
 VOLUME ["/home/node/.n8n"]
@@ -42,3 +44,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
 
 EXPOSE 5678
 
+# Add the start command for n8n
+CMD ["n8n", "start"]
