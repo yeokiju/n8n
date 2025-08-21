@@ -1,4 +1,4 @@
-# n8n with persistent data support and startup script
+# n8n with persistent data support - no CMD override
 FROM n8nio/n8n:latest
 
 # Switch to root for installations
@@ -29,11 +29,11 @@ RUN npm install -g \
 RUN mkdir -p /home/node/.n8n && \
     chown -R node:node /home/node/.n8n
 
-# Set environment variables for proxy trust (Sliplane requirement)
+# Set environment variables
 ENV N8N_TRUST_PROXY=true
 ENV NODE_ENV=production
 
-# Switch back to node user
+# Switch back to node user - IMPORTANT!
 USER node
 
 # Set working directory
@@ -48,5 +48,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
 
 EXPOSE 5678
 
-# Start n8n with the correct command
-CMD ["n8n", "start"]
+# DO NOT override CMD - let the base image handle it
