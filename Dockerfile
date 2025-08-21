@@ -14,6 +14,7 @@ RUN apk add --no-cache \
     curl \
     bash \
     python3 \
+    py3-pip \
     make \
     g++ \
     gcc \
@@ -30,34 +31,68 @@ RUN apk add --no-cache \
     redis \
     imagemagick \
     ffmpeg \
-    poppler-utils \
-    LibreOffice
+    poppler-utils
 
-# Install npm packages
+# Install LibreOffice and required dependencies
+RUN apk add --no-cache \
+    libreoffice \
+    openjdk11-jre \
+    font-noto \
+    font-noto-cjk \
+    font-noto-emoji \
+    ttf-dejavu \
+    ttf-liberation \
+    ttf-linux-libertine \
+    && rm -rf /var/cache/apk/*
+
+# Install Python packages for document processing
+RUN pip3 install --no-cache-dir --break-system-packages \
+    python-docx \
+    pypandoc \
+    html2text || echo "Some Python packages failed to install"
+
+# Install npm packages - Group 1: Essential packages
 RUN npm install -g \
     mammoth@1.6.0 \
+    axios@1.6.0 \
+    lodash@4.17.21 \
+    moment@2.29.4 \
+    uuid@9.0.0 \
+    && npm cache clean --force
+
+# Install npm packages - Group 2: Document processing
+RUN npm install -g \
     officegen@0.6.5 \
     html-docx-js@0.3.1 \
     pdf-parse@1.1.1 \
+    && npm cache clean --force
+
+# Install npm packages - Group 3: Data processing
+RUN npm install -g \
     cheerio@1.0.0-rc.12 \
-    axios@1.6.0 \
-    lodash@4.17.21 \
     csv-parser@3.0.0 \
     xlsx@0.18.5 \
-    moment@2.29.4 \
-    uuid@9.0.0 \
+    && npm cache clean --force
+
+# Install npm packages - Group 4: Security and utilities
+RUN npm install -g \
     jsonwebtoken@9.0.0 \
     bcryptjs@2.4.3 \
-    html-docx-js@0.3.1 \
     && npm cache clean --force
+
+# Install pandoc for advanced document conversion
+RUN apk add --no-cache pandoc
 
 # Create .n8n directory with proper permissions
 RUN mkdir -p /home/node/.n8n && \
     mkdir -p /home/node/.n8n/nodes && \
     mkdir -p /home/node/.n8n/workflows && \
     mkdir -p /home/node/.n8n/backups && \
+    mkdir -p /home/node/.n8n/temp && \
     chown -R node:node /home/node && \
     chmod -R 755 /home/node/.n8n
+
+
 
 # Switch to node user
 USER node
@@ -83,7 +118,8 @@ ENV NODE_PATH=/usr/local/lib/node_modules \
     DB_SQLITE_DATABASE=/home/node/.n8n/database.sqlite \
     DB_SQLITE_POOL_SIZE=2 \
     N8N_RUNNERS_ENABLED=true \
-    NODE_NO_WARNINGS=1
+    NODE_NO_WARNINGS=1 \
+    LIBREOFFICE_PATH=/usr/bin/soffice
 
 # NO VOLUME DECLARATION - data stored in container layer
 
