@@ -25,10 +25,13 @@ RUN npm install -g \
     lodash@4.17.21 \
     && npm cache clean --force
 
-
 # Create necessary directories with proper permissions
 RUN mkdir -p /home/node/.n8n && \
     chown -R node:node /home/node/.n8n
+
+# Set environment variables for proxy trust (Sliplane requirement)
+ENV N8N_TRUST_PROXY=true
+ENV NODE_ENV=production
 
 # Switch back to node user
 USER node
@@ -45,5 +48,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
 
 EXPOSE 5678
 
-# Use the startup script
-CMD ["n8n"]
+# Start n8n with the correct command
+CMD ["n8n", "start"]
