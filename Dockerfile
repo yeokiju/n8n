@@ -1,4 +1,4 @@
-# n8n with persistent data support and proper start command
+# n8n with persistent data support and startup script
 FROM n8nio/n8n:latest
 
 # Switch to root for installations
@@ -25,6 +25,24 @@ RUN npm install -g \
     lodash@4.17.21 \
     && npm cache clean --force
 
+# Create startup script
+RUN cat > /start.sh << 'EOF'
+#!/bin/sh
+# Set proxy trust configuration
+export N8N_TRUST_PROXY=true
+export EXPRESS_TRUST_PROXY=true
+export NODE_ENV=production
+
+# Ensure correct permissions
+chown -R node:node /home/node/.n8n
+
+# Start n8n
+exec n8n start
+EOF
+
+# Make script executable
+RUN chmod +x /start.sh
+
 # Create necessary directories with proper permissions
 RUN mkdir -p /home/node/.n8n && \
     chown -R node:node /home/node/.n8n
@@ -33,7 +51,7 @@ RUN mkdir -p /home/node/.n8n && \
 USER node
 
 # Set working directory
-WORKDIR /usr/local/lib/node_modules/n8n
+WORKDIR /home/node
 
 # Create volume mount point for persistent data
 VOLUME ["/home/node/.n8n"]
@@ -44,6 +62,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
 
 EXPOSE 5678
 
-# Use the n8n binary directly with full path
-ENTRYPOINT ["n8n"]
-CMD ["start", "--tunnel"]
+# Use the startup script
+CMD ["/start.sh"]
