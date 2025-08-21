@@ -1,4 +1,4 @@
-# n8n with persistent data support and pandoc
+# n8n with persistent data support and pandoc (safe build)
 FROM n8nio/n8n:latest
 
 # Switch to root for installations
@@ -13,9 +13,6 @@ RUN apk add --no-cache \
     g++ \
     libc6-compat \
     pandoc \
-    texlive-xetex \
-    fontconfig \
-    ttf-dejavu \
     && rm -rf /var/cache/apk/*
 
 # Install npm packages for document processing
@@ -30,23 +27,10 @@ RUN npm install -g \
 
 # Create necessary directories with proper permissions
 RUN mkdir -p /home/node/.n8n && \
-    mkdir -p /home/node/.pandoc && \
-    chown -R node:node /home/node/.n8n && \
-    chown -R node:node /home/node/.pandoc
+    chown -R node:node /home/node/.n8n
 
 # Switch back to node user
 USER node
-
-# Pandoc specific environment variables
-ENV PANDOC_DATA_DIR=/home/node/.pandoc
-
-# Verify installations
-RUN echo "=== Installation Verification ===" && \
-    pandoc --version && \
-    node --version && \
-    curl --version && \
-    node -e "console.log('mammoth:', require('mammoth') ? 'OK' : 'FAILED')" && \
-    echo "=== All installations completed successfully! ==="
 
 # Create volume mount point for persistent data
 VOLUME ["/home/node/.n8n"]
