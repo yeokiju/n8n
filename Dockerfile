@@ -63,4 +63,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
 EXPOSE 5678
 
 # Use the startup script
-CMD ["/start.sh"]
+CMD ["/usr/local/bin/n8n"]
