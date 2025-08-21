@@ -106,23 +106,6 @@ RUN mkdir -p /home/node/.n8n \
     /home/node/.n8n/custom \
     && chown -R node:node /home/node/.n8n
 
-# Create a startup script for better control
-RUN cat > /start.sh << 'EOF'
-#!/bin/sh
-# Ensure proper permissions
-chown -R node:node /home/node/.n8n 2>/dev/null || true
-chmod 755 /home/node/.n8n 2>/dev/null || true
-
-# Kill any existing n8n processes
-pkill -f n8n 2>/dev/null || true
-sleep 1
-
-# Start n8n
-exec n8n start
-EOF
-
-RUN chmod +x /start.sh
-
 # Switch back to node user
 USER node
 
@@ -145,10 +128,6 @@ ENV NODE_PATH=/usr/local/lib/node_modules \
     N8N_LOG_LEVEL=info \
     PYTHON_PATH=/usr/bin/python3 \
     N8N_PUSH_BACKEND=websocket
-
-# Health check with longer start period
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:5678/healthz || exit 1
 
 # Verify installations
 RUN echo "=== Installed Packages ===" && \
