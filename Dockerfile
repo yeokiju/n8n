@@ -61,5 +61,3 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
 
 EXPOSE 5678
 
-# Use the full path to n8n binary
-CMD ["/usr/local/bin/n8n", "start"]
