@@ -15,7 +15,7 @@ RUN apk add --no-cache \
     gcc \
     libc6-compat \
     pandoc \
-    pkill \
+    procps \
     git \
     openssh \
     ca-certificates \
@@ -24,17 +24,21 @@ RUN apk add --no-cache \
     zip \
     unzip \
     jq \
-    postgresql-client \
+    postgresql15-client \
     mysql-client \
     redis \
     imagemagick \
     graphicsmagick \
     ffmpeg \
     tesseract-ocr \
-    tesseract-ocr-data-eng \
-    tesseract-ocr-data-kor \
     poppler-utils \
     && rm -rf /var/cache/apk/*
+
+# Install Tesseract language data for Korean and English
+RUN mkdir -p /usr/share/tessdata && \
+    cd /usr/share/tessdata && \
+    wget -q https://github.com/tesseract-ocr/tessdata/raw/main/eng.traineddata && \
+    wget -q https://github.com/tesseract-ocr/tessdata/raw/main/kor.traineddata
 
 # Install Python packages for data processing
 RUN pip3 install --no-cache-dir \
