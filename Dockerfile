@@ -6,45 +6,18 @@ USER root
 
 # Install essential packages including curl
 RUN apk add --no-cache \
-curl \
-bash \
-python3 \
-make \
-g++ \
-gcc \
-libc6-compat \
-pandoc \
-procps \
-git \
-openssh \
-ca-certificates \
-openssl \
-wget \
-zip \
-unzip \
-jq \
-libc6-compat
+    curl \
+    bash \
+    python3 \
+    make \
+    g++ \
+    libc6-compat
 
 # Install mammoth and essential npm packages
 RUN npm install -g \
-axios@1.6.0 \
-mammoth@1.6.0 \
-officegen@0.6.5 \
-html-docx-js@0.3.1 \
-cheerio@1.0.0-rc.12 \
-axios@1.6.0 \
-lodash@4.17.21 \
-pdf-parse@1.1.1 \
-csv-parser@3.0.0 \
-xlsx@0.18.5 \
-node-html-parser@6.1.5 \
-jsonwebtoken@9.0.0 \
-bcryptjs@2.4.3 \
-uuid@9.0.0 \
-moment@2.29.4 \
-moment-timezone@0.5.43 \
-dotenv@16.0.3 \
-lodash@4.17.21
+    mammoth@1.6.0 \
+    axios@1.6.0 \
+    lodash@4.17.21
 
 # Switch back to node user
 USER node
