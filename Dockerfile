@@ -4,6 +4,11 @@ FROM n8nio/n8n:latest
 # Switch to root for installations
 USER root
 
+# Add testing repository for LibreOffice and install essential packages
+RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories && \
+    echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories && \
+    apk update
+
 # Install essential packages
 RUN apk add --no-cache \
     curl \
@@ -27,11 +32,24 @@ RUN apk add --no-cache \
     ffmpeg \
     poppler-utils
 
+# Install LibreOffice and required dependencies
+RUN apk add --no-cache \
+    libreoffice \
+    openjdk11-jre \
+    font-noto \
+    font-noto-cjk \
+    font-noto-emoji \
+    ttf-dejavu \
+    ttf-liberation \
+    ttf-linux-libertine \
+    && rm -rf /var/cache/apk/*
+
 # Install npm packages
 RUN npm install -g \
     mammoth@1.6.0 \
     officegen@0.6.5 \
     html-docx-js@0.3.1 \
+    docx2html@1.4.0 \
     pdf-parse@1.1.1 \
     cheerio@1.0.0-rc.12 \
     axios@1.6.0 \
@@ -49,8 +67,34 @@ RUN mkdir -p /home/node/.n8n && \
     mkdir -p /home/node/.n8n/nodes && \
     mkdir -p /home/node/.n8n/workflows && \
     mkdir -p /home/node/.n8n/backups && \
+    mkdir -p /home/node/.n8n/temp && \
     chown -R node:node /home/node && \
     chmod -R 755 /home/node/.n8n
+
+# Create a wrapper script for LibreOffice conversions
+RUN cat > /usr/local/bin/convert-office.sh << 'EOF'
+#!/bin/bash
+# LibreOffice conversion wrapper
+# Usage: convert-office.sh input_file output_format output_dir
+
+INPUT_FILE="$1"
+OUTPUT_FORMAT="$2"
+OUTPUT_DIR="${3:-/tmp}"
+
+if [ -z "$INPUT_FILE" ] || [ -z "$OUTPUT_FORMAT" ]; then
+    echo "Usage: convert-office.sh <input_file> <output_format> [output_dir]"
+    echo "Formats: pdf, html, docx, xlsx, pptx, txt, csv, jpg, png"
+    exit 1
+fi
+
+# Run LibreOffice in headless mode
+soffice --headless --convert-to "$OUTPUT_FORMAT" --outdir "$OUTPUT_DIR" "$INPUT_FILE"
+EOF
+
+RUN chmod +x /usr/local/bin/convert-office.sh
+
+# Verify LibreOffice installation
+RUN soffice --version
 
 # Switch to node user
 USER node
@@ -76,7 +120,8 @@ ENV NODE_PATH=/usr/local/lib/node_modules \
     DB_SQLITE_DATABASE=/home/node/.n8n/database.sqlite \
     DB_SQLITE_POOL_SIZE=2 \
     N8N_RUNNERS_ENABLED=true \
-    NODE_NO_WARNINGS=1
+    NODE_NO_WARNINGS=1 \
+    LIBREOFFICE_PATH=/usr/bin/soffice
 
 # NO VOLUME DECLARATION - data stored in container layer
 
