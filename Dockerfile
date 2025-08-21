@@ -1,4 +1,4 @@
-# n8n with persistent data support - no CMD override
+# n8n with persistent data support using npx
 FROM n8nio/n8n:latest
 
 # Switch to root for installations
@@ -33,7 +33,7 @@ RUN mkdir -p /home/node/.n8n && \
 ENV N8N_TRUST_PROXY=true
 ENV NODE_ENV=production
 
-# Switch back to node user - IMPORTANT!
+# Switch back to node user
 USER node
 
 # Set working directory
@@ -48,4 +48,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
 
 EXPOSE 5678
 
-# DO NOT override CMD - let the base image handle it
+# Use npx to run n8n
+CMD ["npx", "n8n", "start"]
