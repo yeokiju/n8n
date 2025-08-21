@@ -33,7 +33,7 @@ RUN mkdir -p /home/node/.n8n && \
 USER node
 
 # Set working directory
-WORKDIR /home/node
+WORKDIR /usr/local/lib/node_modules/n8n
 
 # Create volume mount point for persistent data
 VOLUME ["/home/node/.n8n"]
@@ -44,5 +44,6 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
 
 EXPOSE 5678
 
-# Add the start command for n8n
-CMD ["n8n", "start"]
+# Use the n8n binary directly with full path
+ENTRYPOINT ["n8n"]
+CMD ["start", "--tunnel"]
