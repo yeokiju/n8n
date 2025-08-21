@@ -25,23 +25,6 @@ RUN npm install -g \
     lodash@4.17.21 \
     && npm cache clean --force
 
-# Create startup script
-RUN cat > /start.sh << 'EOF'
-#!/bin/sh
-# Set proxy trust configuration
-export N8N_TRUST_PROXY=true
-export EXPRESS_TRUST_PROXY=true
-export NODE_ENV=production
-
-# Ensure correct permissions
-chown -R node:node /home/node/.n8n
-
-# Start n8n
-exec n8n start
-EOF
-
-# Make script executable
-RUN chmod +x /start.sh
 
 # Create necessary directories with proper permissions
 RUN mkdir -p /home/node/.n8n && \
